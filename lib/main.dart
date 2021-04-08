@@ -1,23 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: '3D Print Manager',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => MainView(),
-        "/ItemDetail": (context) => ItemDetailView(),
-        "/ItemCreate": (context) => ItemCreateView(),
-        "/ItemEdit": (context) => ItemEditView(),
+    return FutureBuilder(
+      future: _initialization,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          print(snapshot.error);
+          return MaterialApp(
+            title: '3D Print Manager',
+            home: Text("Sorry, something went wrong."),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          return MaterialApp(
+            title: '3D Print Manager',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: Scaffold(
+              appBar: AppBar(
+                title: Text("3D Print Manager"),
+              ),
+              body: Center(
+                child: Text("Welcome Home!"),
+              ),
+            ),
+            /*
+            initialRoute: '/',
+            routes: {
+              '/': (context) => MainView(),
+              "/ItemDetail": (context) => ItemDetailView(),
+              "/ItemCreate": (context) => ItemCreateView(),
+              "/ItemEdit": (context) => ItemEditView(),
+            },
+            */
+          );
+        }
+
+        return MaterialApp(
+          title: '3D Print Manager',
+          home: Text("Getting everything ready..."),
+        );
       },
     );
   }

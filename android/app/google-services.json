@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "354379930128",
+    "project_id": "print-manager-28cad",
+    "storage_bucket": "print-manager-28cad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354379930128:android:0773e7980e3d4ff9040895",
+        "android_client_info": {
+          "package_name": "com.retroject.print_manager_3d"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354379930128-at93hapjss9amicp86r8m6e9gt003gl4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFB7i9d0ho-zY-1xgmtR_09eAk0YwXAgo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354379930128-at93hapjss9amicp86r8m6e9gt003gl4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
