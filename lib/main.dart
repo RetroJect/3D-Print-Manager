@@ -71,7 +71,16 @@ class _AppSetupState extends State<AppSetup> {
           () => Navigator.pushReplacementNamed(context, "/Main"));
     }
 
-    return Text("Getting ready");
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            Text("Hold tight, we're getting everything ready!"),
+            CircularProgressIndicator(),
+          ],
+        ),
+      ),
+    );
   }
 }
 
