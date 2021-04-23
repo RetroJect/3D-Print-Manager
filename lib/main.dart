@@ -1,5 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:print_manager_3d/signIn.dart';
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,13 +19,12 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '3D Print Manager',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData.dark(),
       initialRoute: "/",
       routes: {
         "/": (context) => AppSetup(),
         "/FlutterFireError": (context) => FlutterFireError(),
+        "/Login": (context) => SignInPage(),
         "/Main": (context) => MainView(),
         "/ItemDetail": (context) => ItemDetailView(),
         "/ItemCreate": (context) => ItemCreateView(),
@@ -67,15 +70,26 @@ class _AppSetupState extends State<AppSetup> {
     }
 
     if (_initialized) {
-      Future.delayed(Duration.zero,
-          () => Navigator.pushReplacementNamed(context, "/Main"));
+      // Check if our auth is cached
+      if (_auth.currentUser != null) {
+        // Skip login step and used cached user
+        Future.delayed(Duration.zero,
+            () => Navigator.pushReplacementNamed(context, "/Main"));
+      } else {
+        // No cached user, show login
+        Future.delayed(Duration(seconds: 5),
+            () => Navigator.pushReplacementNamed(context, "/Login"));
+      }
     }
 
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text("Hold tight, we're getting everything ready!"),
+            SizedBox(height: 10),
             CircularProgressIndicator(),
           ],
         ),
@@ -104,6 +118,17 @@ class MainView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Main View"),
+        actions: [
+          Builder(
+            builder: (context) {
+              return TextButton(
+                  onPressed: () => _auth.signOut().then((value) {
+                        Navigator.pushReplacementNamed(context, "/Login");
+                      }),
+                  child: Text("Sign Out"));
+            },
+          )
+        ],
       ),
       body: Center(
         child: Text("This is the main view"),
