@@ -3,56 +3,88 @@ import 'package:firebase_core/firebase_core.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  runApp(App());
 }
 
-class MyApp extends StatelessWidget {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+class App extends StatefulWidget {
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: '3D Print Manager',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      initialRoute: "/",
+      routes: {
+        "/": (context) => AppSetup(),
+        "/FlutterFireError": (context) => FlutterFireError(),
+        "/Main": (context) => MainView(),
+        "/ItemDetail": (context) => ItemDetailView(),
+        "/ItemCreate": (context) => ItemCreateView(),
+        "/ItemEdit": (context) => ItemEditView(),
+      },
+    );
+  }
+}
+
+class AppSetup extends StatefulWidget {
+  _AppSetupState createState() => _AppSetupState();
+}
+
+class _AppSetupState extends State<AppSetup> {
+  bool _initialized = false;
+  bool _error = false;
+
+  void initFlutterFire() async {
+    try {
+      await Firebase.initializeApp();
+      setState(() {
+        _initialized = true;
+      });
+    } catch (e) {
+      print(e);
+      setState(() {
+        _error = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    initFlutterFire();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _initialization,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          print(snapshot.error);
-          return MaterialApp(
-            title: '3D Print Manager',
-            home: Text("Sorry, something went wrong."),
-          );
-        }
+    if (_error) {
+      Future.delayed(Duration.zero,
+          () => Navigator.pushReplacementNamed(context, "/FlutterFireError"));
+    }
 
-        if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            title: '3D Print Manager',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
-            home: Scaffold(
-              appBar: AppBar(
-                title: Text("3D Print Manager"),
-              ),
-              body: Center(
-                child: Text("Welcome Home!"),
-              ),
-            ),
-            /*
-            initialRoute: '/',
-            routes: {
-              '/': (context) => MainView(),
-              "/ItemDetail": (context) => ItemDetailView(),
-              "/ItemCreate": (context) => ItemCreateView(),
-              "/ItemEdit": (context) => ItemEditView(),
-            },
-            */
-          );
-        }
+    if (_initialized) {
+      Future.delayed(Duration.zero,
+          () => Navigator.pushReplacementNamed(context, "/Main"));
+    }
 
-        return MaterialApp(
-          title: '3D Print Manager',
-          home: Text("Getting everything ready..."),
-        );
-      },
+    return Text("Getting ready");
+  }
+}
+
+class FlutterFireError extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Flutter Fire Error"),
+      ),
+      body: Center(
+        child: Text("Something went wrong getting setup."),
+      ),
     );
   }
 }
