@@ -10,7 +10,7 @@ class MainView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Main View"),
+        title: Text("Your Prints"),
         actions: [
           Builder(
             builder: (context) {
@@ -23,9 +23,7 @@ class MainView extends StatelessWidget {
           )
         ],
       ),
-      body: Center(
-        child: Text("This is the main view"),
-      ),
+      body: PrintsList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(context, "/ItemCreate"),
         child: Icon(Icons.add),
@@ -45,18 +43,36 @@ class PrintsList extends StatelessWidget {
     return StreamBuilder(
       stream: userItems,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (!snapshot.hasData) return Text("Fetching your projects...");
+        if (snapshot.hasError)
+          return Center(
+            child: Text("Sorry, something went wrong"),
+          );
 
-        return ListView(
-          children: snapshot.data.docs.map((document) {
-            return ListTile(
-              leading: FlutterLogo(
-                size: 56.0,
+        if (!snapshot.hasData || snapshot.data.docs.length == 0)
+          return Center(
+            child: RichText(
+              text: TextSpan(children: [
+                TextSpan(text: "Tap the "),
+                WidgetSpan(child: Icon(Icons.add)),
+                TextSpan(text: " to get started!")
+              ]),
+            ),
+          );
+
+        List items = snapshot.data.docs;
+        return ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Card(
+              child: ListTile(
+                leading: FlutterLogo(
+                  size: 56.0,
+                ),
+                title: Text(items[index]["title"]),
+                subtitle: Text(items[index]["description"]),
               ),
-              title: Text(document["title"]),
-              subtitle: Text(document["description"]),
             );
-          }).toList(),
+          },
         );
       },
     );

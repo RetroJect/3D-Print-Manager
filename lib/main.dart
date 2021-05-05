@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:print_manager_3d/signIn.dart';
 import 'package:print_manager_3d/mainView.dart';
 
@@ -148,12 +149,68 @@ class ItemEditView extends StatelessWidget {
 class ItemCreateView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+    final TextEditingController titleController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+
+    final CollectionReference items =
+        FirebaseFirestore.instance.collection('items');
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Item Create View"),
+        title: Text("Add Print"),
       ),
-      body: Center(
-        child: Text("This is the Item Create View"),
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            TextFormField(
+              controller: titleController,
+              decoration: InputDecoration(
+                hintText: "The name of the printed item",
+                labelText: "Title",
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty)
+                  return 'Please enter a Title';
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: descriptionController,
+              decoration: InputDecoration(
+                hintText: "A short description of the object",
+                labelText: "Description",
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty)
+                  return 'Please enter a Description';
+                return null;
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  items.add({
+                    'userid': _auth.currentUser.uid,
+                    'title': titleController.text,
+                    'description': descriptionController.text,
+                  }).then((value) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text("Print created")));
+                    Navigator.pop(context);
+                  }).catchError((error) {
+                    print(error);
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Something went wrong, try again soon')));
+                  });
+                }
+              },
+              child: Text('Submit'),
+            )
+          ],
+        ),
       ),
     );
   }
