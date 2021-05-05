@@ -65,9 +65,7 @@ class PrintsList extends StatelessWidget {
           itemBuilder: (BuildContext context, int index) {
             return Card(
               child: ListTile(
-                leading: FlutterLogo(
-                  size: 56.0,
-                ),
+                leading: Image.network(items[index]["image"]),
                 title: Text(items[index]["title"]),
                 subtitle: Text(items[index]["description"]),
               ),

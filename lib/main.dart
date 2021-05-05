@@ -1,9 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:print_manager_3d/signIn.dart';
 import 'package:print_manager_3d/mainView.dart';
+import 'package:uuid/uuid.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -146,7 +151,15 @@ class ItemEditView extends StatelessWidget {
   }
 }
 
-class ItemCreateView extends StatelessWidget {
+class ItemCreateView extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _ItemCreateViewState();
+}
+
+class _ItemCreateViewState extends State<ItemCreateView> {
+  String imageUrl = 'https://i.imgur.com/sUFH1Aq.png';
+  bool disableSubmit = false;
+
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -157,14 +170,75 @@ class ItemCreateView extends StatelessWidget {
     final CollectionReference items =
         FirebaseFirestore.instance.collection('items');
 
+    void uploadImage() async {
+      final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+      final ImagePicker _imagePicker = ImagePicker();
+      PickedFile image;
+
+      await Permission.photos.request();
+      PermissionStatus photoStatus = await Permission.photos.status;
+
+      if (photoStatus.isGranted) {
+        image = await _imagePicker.getImage(source: ImageSource.gallery);
+
+        if (image != null) {
+          File file = File(image.path);
+
+          Uuid uuid = Uuid();
+          var fileName = '${_auth.currentUser.uid}-${uuid.v4()}';
+          await _firebaseStorage.ref(fileName).putFile(file);
+          var downloadUrl =
+              await _firebaseStorage.ref(fileName).getDownloadURL();
+
+          setState(() {
+            imageUrl = downloadUrl;
+          });
+        } else {
+          print('No Image Path');
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:
+                Text("Unable to get image. Please grant image permissions.")));
+      }
+    }
+
+    void submitForm() {
+      if (_formKey.currentState.validate()) {
+        disableSubmit = true;
+        items.add({
+          'userid': _auth.currentUser.uid,
+          'title': titleController.text,
+          'description': descriptionController.text,
+          'image': imageUrl,
+        }).then((value) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text("Print created")));
+          Navigator.pop(context);
+        }).catchError((error) {
+          print(error);
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Something went wrong, try again soon')));
+          Future.delayed(Duration(seconds: 1), () {
+            disableSubmit = false;
+          });
+        });
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Add Print"),
       ),
       body: Form(
         key: _formKey,
-        child: Column(
+        child: ListView(
           children: [
+            Image.network(imageUrl),
+            ElevatedButton(
+              onPressed: uploadImage,
+              child: Text("Choose thumbnail"),
+            ),
             TextFormField(
               controller: titleController,
               decoration: InputDecoration(
@@ -190,23 +264,7 @@ class ItemCreateView extends StatelessWidget {
               },
             ),
             ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState.validate()) {
-                  items.add({
-                    'userid': _auth.currentUser.uid,
-                    'title': titleController.text,
-                    'description': descriptionController.text,
-                  }).then((value) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text("Print created")));
-                    Navigator.pop(context);
-                  }).catchError((error) {
-                    print(error);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Something went wrong, try again soon')));
-                  });
-                }
-              },
+              onPressed: (disableSubmit) ? null : submitForm,
               child: Text('Submit'),
             )
           ],
