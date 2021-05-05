@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:print_manager_3d/signIn.dart';
+import 'package:print_manager_3d/mainView.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -107,35 +108,6 @@ class FlutterFireError extends StatelessWidget {
       ),
       body: Center(
         child: Text("Something went wrong getting setup."),
-      ),
-    );
-  }
-}
-
-class MainView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Main View"),
-        actions: [
-          Builder(
-            builder: (context) {
-              return TextButton(
-                  onPressed: () => _auth.signOut().then((value) {
-                        Navigator.pushReplacementNamed(context, "/Login");
-                      }),
-                  child: Text("Sign Out"));
-            },
-          )
-        ],
-      ),
-      body: Center(
-        child: Text("This is the main view"),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, "/ItemCreate"),
-        child: Icon(Icons.add),
       ),
     );
   }
