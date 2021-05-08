@@ -59,11 +59,11 @@ class _SignInPageState extends State<SignInPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "Welcome to your 3D Print Manager! To get started, sign in.",
+              "Welcome to your 3D Print Manager!",
               style: TextStyle(fontSize: 24, inherit: true),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 25),
+            SizedBox(height: 10),
             SignInButton(
               Buttons.GoogleDark,
               onPressed: () => signInWithGoogle(),

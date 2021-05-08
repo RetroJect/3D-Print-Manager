@@ -106,6 +106,7 @@ class _ItemEditViewState extends State<ItemEditView> {
         curView = Form(
           key: _formKey,
           child: ListView(
+            padding: EdgeInsets.all(16),
             children: [
               Image.network(imageUrl),
               ElevatedButton(
