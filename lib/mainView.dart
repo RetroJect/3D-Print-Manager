@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:print_manager_3d/itemEdit.dart';
+
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class MainView extends StatelessWidget {
@@ -68,6 +70,10 @@ class PrintsList extends StatelessWidget {
                 leading: Image.network(items[index]["image"]),
                 title: Text(items[index]["title"]),
                 subtitle: Text(items[index]["description"]),
+                onLongPress: () {
+                  Navigator.of(context).pushNamed('/ItemEdit',
+                      arguments: ItemEditViewArguments(items[index].id));
+                },
               ),
             );
           },

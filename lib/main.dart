@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:print_manager_3d/signIn.dart';
 import 'package:print_manager_3d/mainView.dart';
-import 'package:uuid/uuid.dart';
+import 'package:print_manager_3d/itemEdit.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -137,20 +139,6 @@ class ItemDetailView extends StatelessWidget {
   }
 }
 
-class ItemEditView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Item Edit View"),
-      ),
-      body: Center(
-        child: Text("This is the Item Edit View"),
-      ),
-    );
-  }
-}
-
 class ItemCreateView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _ItemCreateViewState();
@@ -205,7 +193,9 @@ class _ItemCreateViewState extends State<ItemCreateView> {
 
     void submitForm() {
       if (_formKey.currentState.validate()) {
-        disableSubmit = true;
+        setState(() {
+          disableSubmit = true;
+        });
         items.add({
           'userid': _auth.currentUser.uid,
           'title': titleController.text,
@@ -220,7 +210,9 @@ class _ItemCreateViewState extends State<ItemCreateView> {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Something went wrong, try again soon')));
           Future.delayed(Duration(seconds: 1), () {
-            disableSubmit = false;
+            setState(() {
+              disableSubmit = false;
+            });
           });
         });
       }
