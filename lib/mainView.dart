@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:print_manager_3d/itemEdit.dart';
+import 'package:print_manager_3d/itemDetail.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -73,6 +74,10 @@ class PrintsList extends StatelessWidget {
                 onLongPress: () {
                   Navigator.of(context).pushNamed('/ItemEdit',
                       arguments: ItemEditViewArguments(items[index].id));
+                },
+                onTap: () {
+                  Navigator.of(context).pushNamed('/ItemDetail',
+                      arguments: ItemDetailViewArguments(items[index].id));
                 },
               ),
             );

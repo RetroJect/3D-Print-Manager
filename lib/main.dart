@@ -6,11 +6,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
-
 import 'package:permission_handler/permission_handler.dart';
+
 import 'package:print_manager_3d/signIn.dart';
 import 'package:print_manager_3d/mainView.dart';
 import 'package:print_manager_3d/itemEdit.dart';
+import 'package:print_manager_3d/itemDetail.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -121,24 +122,6 @@ class FlutterFireError extends StatelessWidget {
   }
 }
 
-class ItemDetailView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Item Detail View"),
-      ),
-      body: Center(
-        child: Text("This is the Item Detail View"),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, "/ItemEdit"),
-        child: Icon(Icons.edit),
-      ),
-    );
-  }
-}
-
 class ItemCreateView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _ItemCreateViewState();
@@ -225,6 +208,7 @@ class _ItemCreateViewState extends State<ItemCreateView> {
       body: Form(
         key: _formKey,
         child: ListView(
+          padding: EdgeInsets.all(16),
           children: [
             Image.network(imageUrl),
             ElevatedButton(
